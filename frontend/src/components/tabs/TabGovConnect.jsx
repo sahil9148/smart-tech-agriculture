@@ -24,16 +24,29 @@ export default function TabGovConnect({ showToast }) {
   }, [search, load])
 
   const apply = async (scheme) => {
+    // Already tracked locally — just reopen the real portal, no need to re-POST.
+    if (scheme.applied) {
+      if (scheme.applyUrl) window.open(scheme.applyUrl, '_blank', 'noopener,noreferrer')
+      return
+    }
     setApplying(scheme.name)
     try {
       await Schemes.apply({ schemeName: scheme.name, category: scheme.category, badge: scheme.badge })
       setSchemes(list => list.map(s => s.name === scheme.name ? { ...s, applied: true, applicationStatus: 'pending' } : s))
-      showToast(`Application for "${scheme.name}" submitted! ✓`)
+      showToast(`Tracked in your dashboard — opening the official portal ✓`)
+      // Local tracking above records this scheme in the farmer's own dashboard.
+      // The actual application happens on the real government portal, which
+      // opens here since no third-party app can submit it on their behalf.
+      if (scheme.applyUrl) window.open(scheme.applyUrl, '_blank', 'noopener,noreferrer')
     } catch (err) {
       showToast(err.message, 'error')
     } finally {
       setApplying(null)
     }
+  }
+
+  const openOfficial = (scheme) => {
+    if (scheme.applyUrl) window.open(scheme.applyUrl, '_blank', 'noopener,noreferrer')
   }
 
   return (
@@ -65,13 +78,21 @@ export default function TabGovConnect({ showToast }) {
               <div className="category">{s.category}</div>
               <h3>{s.name}</h3>
               <p>{s.desc}</p>
-              <button
-                className={`btn btn-sm ${s.applied ? 'btn-ghost' : 'btn-primary'} btn-full`}
-                onClick={() => apply(s)}
-                disabled={s.applied || applying === s.name}
-              >
-                {applying === s.name ? 'Submitting...' : s.applied ? `✓ ${s.applicationStatus === 'approved' ? 'Approved' : 'Applied'}` : 'Apply Now →'}
-              </button>
+              <div style={{ display: 'flex', gap: 8 }}>
+                <button
+                  className={`btn btn-sm ${s.applied ? 'btn-ghost' : 'btn-primary'}`}
+                  style={{ flex: 1 }}
+                  onClick={() => apply(s)}
+                  disabled={applying === s.name}
+                >
+                  {applying === s.name ? 'Opening...' : s.applied ? `✓ ${s.applicationStatus === 'approved' ? 'Approved' : 'Tracked'} — reopen ↗` : 'Apply Now ↗'}
+                </button>
+                {!s.applied && (
+                  <button className="btn btn-sm btn-outline" onClick={() => openOfficial(s)} title="Open the official portal without tracking it yet">
+                    Preview ↗
+                  </button>
+                )}
+              </div>
             </div>
           ))}
         </div>

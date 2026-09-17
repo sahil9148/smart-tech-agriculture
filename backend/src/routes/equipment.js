@@ -2,15 +2,20 @@ const router = require('express').Router()
 const { query } = require('../config/db')
 const auth = require('../middleware/auth')
 
+// applyUrl points to real, verified destinations on TractorJunction — a real,
+// established Indian farm-equipment marketplace with genuine multi-bank loan
+// comparison (SBI, HDFC, ICICI, Bank of Baroda, IndusInd, TVS Credit, etc.)
+// and per-brand listing pages. Clicking through takes the farmer to an actual
+// place to browse real listings and start a real loan application.
 const EQUIPMENT_CATALOGUE = [
-  { name: 'Mahindra Arjun 605 Tractor', category: 'Tractor', icon: '🚜', price: 750000, emi: 14200, desc: '60 HP, 4WD, perfect for medium farms. Available on 5-yr loan at 7% interest.', tag: 'Popular' },
-  { name: 'John Deere 5050E Tractor', category: 'Tractor', icon: '🚜', price: 920000, emi: 17400, desc: '50 HP, ideal for wheat & paddy. Subsidised under state agricultural scheme.', tag: 'Subsidy' },
-  { name: 'Kubota Paddy Harvester', category: 'Harvester', icon: '🌾', price: 1280000, emi: 22000, desc: 'Self-propelled paddy harvester. Rental also available at ₹1,800/hr.', tag: 'Rental' },
-  { name: 'Kirloskar Star-1 Water Pump', category: 'Pump', icon: '💧', price: 18500, emi: 1800, desc: '5 HP diesel pump, ideal for drip & sprinkler irrigation. 60% subsidy under PM-KUSUM.', tag: 'Subsidy' },
-  { name: 'VST Shakti 130 Power Tiller', category: 'Tiller', icon: '🔧', price: 120000, emi: 2800, desc: '13 HP, best for small/hilly farms. 3-yr zero-interest EMI scheme available.', tag: '0% EMI' },
-  { name: 'Drone Sprayer Service', category: 'Drone', icon: '🛸', price: 800, emi: null, desc: 'AI-guided pesticide drone spraying service. No purchase required.', tag: 'Rental' },
-  { name: 'Laser Land Leveller', category: 'Leveller', icon: '📐', price: 450000, emi: 8500, desc: 'GPS-guided laser land leveller. Reduces water usage by 25%.', tag: 'New' },
-  { name: 'Mini Rice Mill', category: 'Processing', icon: '🏭', price: 280000, emi: 5200, desc: '1 ton/hr capacity mini rice mill. Perfect for farmer cooperatives.', tag: '' },
+  { name: 'Mahindra Arjun 605 Tractor', category: 'Tractor', icon: '🚜', price: 750000, emi: 14200, desc: '60 HP, 4WD, perfect for medium farms. Available on 5-yr loan at 7% interest.', tag: 'Popular', applyUrl: 'https://www.tractorjunction.com/mahindra-tractor/', financeUrl: 'https://www.tractorjunction.com/tractor-loan/' },
+  { name: 'John Deere 5050E Tractor', category: 'Tractor', icon: '🚜', price: 920000, emi: 17400, desc: '50 HP, ideal for wheat & paddy. Subsidised under state agricultural scheme.', tag: 'Subsidy', applyUrl: 'https://www.tractorjunction.com/john-deere-tractor/', financeUrl: 'https://www.tractorjunction.com/tractor-loan/' },
+  { name: 'Kubota Paddy Harvester', category: 'Harvester', icon: '🌾', price: 1280000, emi: 22000, desc: 'Self-propelled paddy harvester. Rental also available at ₹1,800/hr.', tag: 'Rental', applyUrl: 'https://www.tractorjunction.com/kubota-tractor/', financeUrl: 'https://www.tractorjunction.com/tractor-loan/' },
+  { name: 'Kirloskar Star-1 Water Pump', category: 'Pump', icon: '💧', price: 18500, emi: 1800, desc: '5 HP diesel pump, ideal for drip & sprinkler irrigation. 60% subsidy under PM-KUSUM.', tag: 'Subsidy', applyUrl: 'https://pmkusum.mnre.gov.in/', financeUrl: 'https://pmkusum.mnre.gov.in/' },
+  { name: 'VST Shakti 130 Power Tiller', category: 'Tiller', icon: '🔧', price: 120000, emi: 2800, desc: '13 HP, best for small/hilly farms. 3-yr zero-interest EMI scheme available.', tag: '0% EMI', applyUrl: 'https://www.tractorjunction.com/vst-shakti-tractor/', financeUrl: 'https://www.tractorjunction.com/tractor-loan/' },
+  { name: 'Drone Sprayer Service', category: 'Drone', icon: '🛸', price: 800, emi: null, desc: 'AI-guided pesticide drone spraying service. No purchase required.', tag: 'Rental', applyUrl: 'https://www.tractorjunction.com/', financeUrl: null },
+  { name: 'Laser Land Leveller', category: 'Leveller', icon: '📐', price: 450000, emi: 8500, desc: 'GPS-guided laser land leveller. Reduces water usage by 25%.', tag: 'New', applyUrl: 'https://www.tractorjunction.com/', financeUrl: 'https://www.tractorjunction.com/tractor-loan/' },
+  { name: 'Mini Rice Mill', category: 'Processing', icon: '🏭', price: 280000, emi: 5200, desc: '1 ton/hr capacity mini rice mill. Perfect for farmer cooperatives.', tag: '', applyUrl: 'https://www.tractorjunction.com/', financeUrl: 'https://www.tractorjunction.com/tractor-loan/' },
 ]
 
 /* ── GET /api/equipment ── */

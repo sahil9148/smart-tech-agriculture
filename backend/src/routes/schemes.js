@@ -2,20 +2,19 @@ const router = require('express').Router()
 const { query } = require('../config/db')
 const auth = require('../middleware/auth')
 
-// All available schemes (static catalogue - would come from an admin CMS in production)
+// Real government schemes with their actual official application portals.
+// URLs verified September 2026 — if a ministry restructures a portal, update
+// applyUrl here; this is the only place it needs to change.
 const SCHEMES_CATALOGUE = [
-  { name: 'PM-KISAN Samman Nidhi', category: 'Income Support', badge: 'Central Govt', desc: '₹6,000/year direct income support in 3 installments to all landholding farmer families.' },
-  { name: 'Kisan Credit Card (KCC)', category: 'Credit', badge: 'NABARD', desc: 'Flexible credit for crop cultivation, post harvest, maintenance. Low interest @ 4% p.a.' },
-  { name: 'PMFBY — Crop Insurance', category: 'Insurance', badge: 'Central Govt', desc: 'Affordable crop insurance against natural calamities, pests & disease. Premium from 1.5%.' },
-  { name: 'Soil Health Card Scheme', category: 'Soil Testing', badge: 'Ministry of Agri', desc: 'Free soil health card with crop-wise fertilizer recommendations.' },
-  { name: 'PM-KUSUM Solar Pump Scheme', category: 'Equipment Subsidy', badge: 'State + Central', desc: 'Up to 60% subsidy on solar pumps for irrigation.' },
-  { name: 'eNAM — Electronic APMC', category: 'Market Access', badge: 'Ministry of Agri', desc: 'Online trading platform for agricultural commodities across 1000+ mandis.' },
-  { name: 'Paramparagat Krishi Vikas Yojana', category: 'Organic Farming', badge: 'Central Govt', desc: '₹50,000/ha for 3 years for organic farming adoption.' },
-  { name: 'National Livestock Mission', category: 'Animal Husbandry', badge: 'Ministry of AHD', desc: 'Subsidies and support for livestock development and risk management.' },
-  { name: 'Agri Infrastructure Fund', category: 'Infrastructure', badge: 'Central Govt', desc: '₹1 Lakh crore for farm-gate infrastructure and agri-logistics.' },
-  { name: 'PM Fasal Bima Yojana', category: 'Insurance', badge: 'Central Govt', desc: 'Comprehensive crop insurance with low premiums for kharif and rabi crops.' },
-  { name: 'Pradhan Mantri Krishi Sinchayee Yojana', category: 'Irrigation', badge: 'Central Govt', desc: 'Water to every farm — drip/sprinkler irrigation subsidy up to 55% for small farmers.' },
-  { name: 'Rashtriya Krishi Vikas Yojana', category: 'Development', badge: 'Central Govt', desc: 'Grants for state agricultural development plans and infrastructure.' },
+  { name: 'PM-KISAN Samman Nidhi', category: 'Income Support', badge: 'Central Govt', desc: '₹6,000/year direct income support in 3 installments to all landholding farmer families.', applyUrl: 'https://pmkisan.gov.in/' },
+  { name: 'Kisan Credit Card (KCC)', category: 'Credit', badge: 'NABARD', desc: 'Flexible credit for crop cultivation, post harvest, maintenance. Low interest @ 4% p.a. via the Jan Samarth portal.', applyUrl: 'https://www.jansamarth.in/kisan-credit-card-scheme' },
+  { name: 'PMFBY — Crop Insurance', category: 'Insurance', badge: 'Central Govt', desc: 'Affordable crop insurance against natural calamities, pests & disease. Premium from 1.5%.', applyUrl: 'https://pmfby.gov.in/' },
+  { name: 'Soil Health Card Scheme', category: 'Soil Testing', badge: 'Ministry of Agri', desc: 'Free soil health card with crop-wise fertilizer recommendations.', applyUrl: 'https://soilhealth.dac.gov.in/' },
+  { name: 'PM-KUSUM Solar Pump Scheme', category: 'Equipment Subsidy', badge: 'MNRE', desc: 'Up to 60% subsidy on solar pumps for irrigation.', applyUrl: 'https://pmkusum.mnre.gov.in/' },
+  { name: 'eNAM — Electronic APMC', category: 'Market Access', badge: 'Ministry of Agri', desc: 'Online trading platform for agricultural commodities across 1600+ mandis.', applyUrl: 'https://enam.gov.in/web/' },
+  { name: 'Paramparagat Krishi Vikas Yojana', category: 'Organic Farming', badge: 'Central Govt', desc: 'Financial assistance of ₹31,500/ha over 3 years for organic farming adoption via PGS-India certification.', applyUrl: 'https://pgsindia-ncof.gov.in/' },
+  { name: 'National Livestock Mission', category: 'Animal Husbandry', badge: 'Ministry of AHD', desc: 'Subsidies and support for poultry, sheep, goat and piggery entrepreneurship via the Udyami Mitra portal.', applyUrl: 'https://nlm.udyamimitra.in/' },
+  { name: 'Agri Infrastructure Fund', category: 'Infrastructure', badge: 'Central Govt', desc: '₹1 Lakh crore financing facility for farm-gate infrastructure — cold storage, warehousing, processing units.', applyUrl: 'https://agriinfra.dac.gov.in/' },
 ]
 
 /* ── GET /api/schemes ── */
